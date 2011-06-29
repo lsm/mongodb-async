@@ -1,0 +1,20 @@
+{
+  "name": "mongodb-async",
+  "description": "Thin & clean async wrapper for mongodb",
+  "version": "0.1.0",
+  "keywords": ["mongodb", "async", "promise", "deferred"],
+  "homepage": "https://github.com/zir/mongodb-async",
+  "author": "Senmiao Liu <zir.echo@gmail.com>",
+  "repository" : {
+    "type" : "git",
+    "url" : "git://github.com/zir/mongodb-async.git"
+  },
+  "main": "./index",
+  "dependencies": {
+    "mongodb": "0.9.6-1",
+    "genji": "https://github.com/zir/genji/tarball/master"
+  },
+  "engines": {
+    "node": "0.4.8"
+  }
+}
