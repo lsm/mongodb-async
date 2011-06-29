@@ -4,7 +4,7 @@
 
 `cd mongodb-async`
 
-`node test/quick.test.js
+`node test/quick.test.js`
 
 usage:
 
