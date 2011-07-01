@@ -14,7 +14,7 @@
     "lib": "./lib"
   },
   "dependencies": {
-    "mongodb": "0.9.6-1",
+    "mongodb": "0.9.6-3",
     "genji": "https://github.com/zir/genji/tarball/master"
   },
   "engines": {
