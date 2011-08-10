@@ -1,35 +1,113 @@
 ## Quick start
 
-`git clone git://github.com/zir/mongodb-async.git mongodb-async`
+#### Install
 
-`cd mongodb-async`
+`npm install mongodb-async`
 
-`node test/quick.test.js`
+#### Usage:
 
-usage:
+Basically you can write any mongodb operation in this way:
 
-    var connect = require('../index').connect;
-    var server = connect('127.0.0.1', 27017, {});
-    var db = server.db('test', {});
-    var testColl = db.collection('test', {});
+    myCollection
+      .cmd(arg1, arg2, ...)
+      .and(callback1)
+      .and(callback2)
+      .fail(errorHandler)
+      .done(finishHandler);
 
-    function dumpFailure(err) {
+
+Let's see some real example
+
+Require `mongodb-async`, there is only one entry point `connect`
+
+    var connect = require('mongodb-async').connect;
+
+Connect to a `server` choose your `db` and `collection`
+
+    var server = connect('127.0.0.1', 27017);
+    var db = server.db('test_mongodb_async');
+    var testCollection = db.collection('test');
+
+Yes, you can write it in this way:
+
+    var testCollection = connect('127.0.0.1', 27017).db('test_mongodb_async').collection('test');
+
+
+Make some data
+
+    var doc = {x: (new Date).getTime() + ''};
+
+Let's insert it:
+
+    var deferred = testCollection.insert(doc, {safe: true});
+
+the `onDocSaved` function will be called when doc saved successfully
+
+    deferred
+      .and(function onDocSaved(defer, result) {
+        console.log('document saved');
+        console.log(result);
+        return true;
+        // `return true` is equal to `defer.next(result)`, see below
+      });
+
+There're 2 ways you can make the deferred callbacks chain going to next step
+
+1. just return `true`, and all arguments received in current step would be passed to next step without modification.
+
+2. call `defer.next({x: 'modified'})` if you want to modify data or your operation is async.
+
+If error happens just call `defer.error(yourErrorObj)`.
+
+
+Find the inserted document:
+
+    deferred
+      .and(function findDoc(outerDefer, result) {
+
+        // Since you `return true` in previous step, the `result` passed to you here untouched.
+
+        testCollection
+          .findOne({x: doc.x})
+          .and(function(innerDefer, docFound) {
+            console.log('found: %s', docFound.x === result[0].x);
+          })
+          .fail(outerDefer.error);
+          
+      });
+      
+If you have another async operation inside,
+you can use `.fail(outerDefer.error)` to route the error to `outerDefer`'s error handling function.
+Thus you can handle error in just one place
+
+Register error handling function like this
+
+    deferred.fail(function dumpFailure(err) {
       console.error(err.stack || err);
-    }
+    });
 
-    var time = (new Date).getTime() + '';
 
-    testColl.insert({x: time})
-    .and(function(defer, result) {
-      console.log('document saved');
-      return true; // equal to defer.next(result)
-    })
-    .and(function(defer, inserted) {
-      testColl.findOne({x: time}).and(
-          function(defer, doc) {
-            console.log('found: %s', doc.x === inserted[0].x);
-          }).fail(defer.error);
-    })
-    .fail(dumpFailure);
+Here is the above example without comments:
 
+    var connect = require('mongodb-async').connect;
+    var testCollection = connect('127.0.0.1', 27017).db('test_mongodb_async').collection('test');
+
+    var doc = {x: (new Date).getTime() + ''};
     
+    var deferred = testCollection.insert(doc, {safe: true})
+      .and(function onDocSaved(defer, result) {
+        console.log('document saved');
+        console.log(result);
+        return true;
+      })
+      .and(function findDoc(outerDefer, result) {
+        testCollection
+          .findOne({x: doc.x})
+          .and(function(innerDefer, docFound) {
+            console.log('found: %s', docFound.x === result[0].x);
+          })
+          .fail(outerDefer.error);
+      })
+      .fail(function dumpFailure(err) {
+        console.error(err.stack || err);
+      });
