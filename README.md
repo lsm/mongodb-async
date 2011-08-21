@@ -1,21 +1,26 @@
 ## Quick start
 
-#### Install
+### Installation
 
 `npm install mongodb-async`
 
-#### Usage:
+### Usage
 
+#### Syntax
 Basically you can write any mongodb operation in this way:
 
     myCollection
       .cmd(arg1, arg2, ...)
       .and(callback1)
-      .and(callback2)
+      .and(callback2, callback3, callback4)
       .fail(errorHandler)
       .done(finishHandler);
 
+Where `cmd` could be:
 
+`open`, `insert`, `save`, `update`, `remove`, `rename`, `findEach`, `find`, `findOne`, `findAndModify`, `count`, `distinct`, `createIndex`, `ensureIndex`, `getIndexes`, `drop`, `dropIndex`, `dropIndexes`, `mapReduce`
+
+#### Example
 Let's see some real example
 
 Require `mongodb-async`, there is only one entry point `connect`
