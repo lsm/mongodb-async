@@ -46,7 +46,7 @@ Let's insert it:
 
     var deferred = testCollection.insert(doc, {safe: true});
 
-the `onDocSaved` function will be called when doc saved successfully
+the `onDocSaved` function will be called when `doc` saved successfully
 
     deferred
       .and(function onDocSaved(defer, result) {
