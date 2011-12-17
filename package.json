@@ -1,7 +1,7 @@
 {
   "name": "mongodb-async",
   "description": "Thin & clean async wrapper for mongodb",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "keywords": ["mongodb", "async", "flow", "promise", "deferred"],
   "homepage": "https://github.com/zir/mongodb-async",
   "author": "Senmiao Liu <zir.echo@gmail.com>",
@@ -14,10 +14,10 @@
     "lib": "./lib"
   },
   "dependencies": {
-    "mongodb": ">= 0.9.6-7 < 0.9.7",
-    "genji": "0.2.0"
+    "mongodb": ">= 0.9.6-7",
+    "genji": "0.2.3"
   },
   "engines": {
-    "node": ">=0.4.8 < 0.5.0"
+    "node": ">=0.4.8"
   }
 }
