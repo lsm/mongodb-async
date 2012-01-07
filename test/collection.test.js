@@ -1,4 +1,4 @@
-var connect = require('mongodb-async').connect;
+var connect = require('../index').connect;
 var assert = require('assert');
 
 
@@ -12,10 +12,14 @@ function dumpFailure(err) {
 
 var removeCount = 0;
 function removeDocBySelector(defer, selector) {
-  testColl.remove(selector, {safe: true})
+  if (selector) {
+    testColl.remove(selector, {safe: true})
     .and(function (defer, removedCount) {
-      if (++removeCount >= 4) db.close();
+      if (++removeCount >= 5) db.close();
     }).fail(defer.error);
+  } else {
+    if (++removeCount >= 5) db.close();
+  }
 }
 
 exports['test CRUD'] = function() {
@@ -89,7 +93,6 @@ exports['test findAndModify'] = function() {
     .fail(dumpFailure);
 };
 
-
 exports['test count'] = function() {
   var time = (new Date).getTime() + '_count';
   var docs = [{x: time}, {x: time}, {x: time}];
@@ -107,3 +110,18 @@ exports['test count'] = function() {
     .fail(dumpFailure);
 };
 
+exports['test events'] = function() {
+  var error;
+  testColl.db.on('fail', function(err) {
+    error = err;
+    assert.eql(true, err instanceof Error);
+  });
+  testColl.update({x: 1}, {$set: 1}, {safe: true}).then(
+    function(updated) {
+      assert.eql(1, 2); // should not be called
+    }).fail(function(err) {
+      // event emitted earlier than `fail`
+      assert.eql(err, error);
+      removeDocBySelector({});
+    });
+};
