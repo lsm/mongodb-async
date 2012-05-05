@@ -15,10 +15,10 @@ function removeDocBySelector(defer, selector) {
   if (selector) {
     testColl.remove(selector, {safe: true})
     .and(function (defer, removedCount) {
-      if (++removeCount >= 5) db.close();
+      if (++removeCount >= 6) db.close();
     }).fail(defer.error);
   } else {
-    if (++removeCount >= 5) db.close();
+    if (++removeCount >= 6) db.close();
   }
 }
 
@@ -124,4 +124,33 @@ exports['test events'] = function() {
       assert.eql(err, error);
       removeDocBySelector({});
     });
+};
+
+exports['test nextId'] = function () {
+  testColl
+    .nextId('testAutoIncrementalId', 2567)
+    .and(function (defer, id) {
+      assert.eql(id, 2567);
+      defer.next();
+    })
+    .and(function (defer) {
+      testColl
+        .nextId('testAutoIncrementalId', 3)
+        .and(function (d, id) {
+          assert.eql(id, 2570);
+          defer.next();
+        });
+    })
+    .and(function (defer) {
+      testColl.nextId('testAutoIncrementalId', 10, 20)
+        .then(function (id) {
+          assert.eql(true, id >= 2580);
+          assert.eql(true, id <= 2590);
+          defer.next();
+        }).fail(dumpFailure);
+    })
+    .and(function (defer) {
+      removeDocBySelector(defer, {_id: 'testAutoIncrementalId'});
+    })
+    .fail(dumpFailure);
 };
