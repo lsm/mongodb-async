@@ -14,7 +14,7 @@
     "lib": "./lib"
   },
   "dependencies": {
-    "mongodb": "1.1.x",
+    "mongodb": "1.0.x",
     "genji": "0.3.0"
   },
   "engines": {
