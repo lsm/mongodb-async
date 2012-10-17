@@ -1,1 +1,1 @@
-module.exports = require('./lib/mongodb-async');
+module.exports = require('./lib/connection');
